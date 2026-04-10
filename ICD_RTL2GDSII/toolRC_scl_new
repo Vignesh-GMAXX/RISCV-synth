@@ -1,0 +1,93 @@
+#!/bin/csh -f
+
+#----------Cadence Environmental Variables---------------
+echo ""
+echo "toolRC provided by H4R5H"
+
+setenv CDS_Netlisting_Mode "Analog"
+setenv QRC_ENABLE_EXTRACTION
+
+#-----------------License setup--------------
+
+setenv CDS_LIC_FILE 5280@14.139.1.126
+setenv LM_LICENSE_FILE 1717@14.139.1.126
+setenv MGLS_LICENSE_FILE 1717@14.139.1.126
+setenv FLEXLM_DIAGNOSTICS 3
+setenv CWB_GL1_YES 1
+setenv ALTOS_QUEUE 1
+
+#-----------------Variable setup--------------
+
+#setenv ISCAPEHOME /opt/tools/Cadence/CadenceTools/IScape
+setenv ISCAPEHOME /opt/tools/Cadence/Cadence_tools/IScape
+setenv SSV_HOME /opt/tools/Cadence/CadenceTools/SSV211
+#setenv CDS_HOME /opt/tools/Cadence/CadenceTools/IC618
+setenv CDS_HOME /opt/tools/Cadence/Cadence_tools/IC618
+#setenv INCISIVEHOME /opt/tools/Cadence/CadenceTools/INCISIVE152
+setenv INCISIVEHOME /opt/tools/Cadence/Cadence_tools/INCISIVE152
+#setenv SPECTREHOME /opt/tools/Cadence/CadenceTools/SPECTRE201
+setenv SPECTREHOME /opt/tools/Cadence/Cadence_tools/SPECTRE191
+#setenv ALTOSHOME /opt/tools/Cadence/CadenceTools/LIBERATE217
+setenv ALTOSHOME /opt/tools/Cadence/Cadence_tools/LIBERATE192
+#setenv INNOVUSHOME /opt/tools/Cadence/CadenceTools/INNOVUS211
+setenv INNOVUSHOME /opt/tools/Cadence/Cadence_tools/INNOVUS211
+setenv QUANTUSHOME /opt/tools/Cadence/CadenceTools/QUANTUS201
+setenv PVSHOME /opt/tools/Cadence/CadenceTools/PVS191/bin
+#setenv CALIBRE_HOME /opt/tools/Cadence/CalibreNew/aoi_cal_2022.2_15.10
+setenv CALIBRE_HOME /opt/tools/Cadence/mentor/CalibreNew/aoi_cal_2022.2_15.10
+#setenv MGC_HOME /opt/tools/Cadence/CalibreNew/aoi_cal_2022.2_15.10
+setenv MGC_HOME /opt/tools/Cadence/mentor/CalibreNew/aoi_cal_2022.2_15.10
+#setenv GENUSHOME /opt/tools/Cadence/CadenceTools/GENUS211
+setenv GENUSHOME /opt/tools/Cadence/Cadence_tools/GENUS
+setenv VIVADO /opt/Xilinx/Vivado/2018.2
+setenv JUGHOME /opt/tools/Cadence/CadenceTools/JUG/jasper_2023.12p001
+#-----------------Path setup--------------
+
+set path = ($ISCAPEHOME/bin $path )
+set path = ($CDS_HOME/bin $CDS_HOME/tools.lnx86/dfII/bin $path )
+set path = ($INCISIVEHOME/bin $INCISIVEHOME/tools.lnx86/bin  $path)
+set path = ($SPECTREHOME/bin $path )
+set path = ($ALTOSHOME/bin $path )
+set path = (${INNOVUSHOME}/bin ${INNOVUSHOME}/share/bin ${INNOVUSHOME}/tools.lnx86/bin $INNOVUSHOME/tools/dfII/bin $INNOVUSHOME/oa_v22.50.028/bin $path )
+set path = ($QUANTUSHOME/bin $path )
+set path = ($CALIBRE_HOME/bin $path )
+set path = ($PVSHOME/bin $path $PVSHOME/tools.lnx86/bin)
+set path = (${GENUSHOME}/bin ${GENUSHOME}/share/bin ${GENUSHOME}/tools.lnx86/bin $path )
+set path = ($MGC_HOME/bin $path )
+set path = ($SSV_HOME/bin $path )
+set path = ($JUGHOME/bin $path )
+
+#-------Xilinx Vivado path------#
+
+set path = ($VIVADO/bin  $path )
+
+#---------End of toolRC--------------------------------------
+#Default 64 bit toot setup
+setenv CDS_AUTO_64BIT ALL
+
+echo ""
+echo "Welcome to Cadence Tool Suite"
+echo ""
+
+#OS related setup
+setenv OA_UNSUPPORTED_PLAT linux_rhel50_gcc44x
+
+#pkill cdsNameServer
+#-----------------------------------------------------------
+
+#-------SCL180nm Setup------#
+
+setenv KIT_DIR /opt/tools/Cadence/Cadence_lib/scl_pdk_v3/SCLPDK_V3.0_KIT/scl180/pdk/cdns/sclpdk_v3
+setenv RDS_ROOT $KIT_DIR/HOTCODE
+setenv MGC_CALIBRE_CUSTOMIZATION_FILE $RDS_ROOT/techs/generic/calibre/calibre_ts_drc.custom
+setenv PERL5 /bin/perl
+source $RDS_ROOT/etc/RDS.cshrc
+source $RDS_ROOT/etc/cdsDesKit.cshrc
+source $RDS_ROOT/etc/cdsSystem.cshrc
+setenv PROJ_ROOT /home/anirudh24/Work
+echo "**********************************************"
+echo "SCL PDK flow setup with Cadence Virtuoso is complete"
+echo "**********************************************"
+
+#---------------------------#
+

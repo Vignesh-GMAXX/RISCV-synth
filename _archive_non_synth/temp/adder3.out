@@ -1,0 +1,34 @@
+#! /c/Source/iverilog-install/bin/vvp
+:ivl_version "12.0 (devel)" "(s20150603-1539-g2693dd32b)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "C:\iverilog\lib\ivl\system.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_sys.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2009.vpi";
+S_000001c929af2a50 .scope package, "$unit" "$unit" 2 1;
+ .timescale 0 0;
+S_000001c929af2be0 .scope module, "adder" "adder" 3 1;
+ .timescale 0 0;
+    .port_info 0 /INPUT 32 "a";
+    .port_info 1 /OUTPUT 32 "adder_out";
+o000001c929b26f88 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v000001c929af2d70_0 .net "a", 31 0, o000001c929b26f88;  0 drivers
+v000001c929af2e10_0 .var "adder_out", 31 0;
+E_000001c929b24fb0 .event anyedge, v000001c929af2d70_0;
+    .scope S_000001c929af2be0;
+T_0 ;
+    %wait E_000001c929b24fb0;
+    %load/vec4 v000001c929af2d70_0;
+    %addi 4, 0, 32;
+    %store/vec4 v000001c929af2e10_0, 0, 32;
+    %jmp T_0;
+    .thread T_0, $push;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "-";
+    "design\adder.v";

@@ -1,0 +1,29 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Tool/runtime outputs
+*.log
+*.jou
+*.str
+*.history
+
+# Optional generated run directories
+genus/outputs/
+genus/reports/
+genus/logs/
+innovus/outputs/
+innovus/reports/
+innovus/logs/
+innovus/run/

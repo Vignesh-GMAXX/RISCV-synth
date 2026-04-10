@@ -1,0 +1,48 @@
+#--------------------------------#
+
+For creating a new project library:
+
+Copy the toolRC_scl_new shared in the classroom to your home directory.
+
+Edit toolRC_scl_new and change path of PROJ_ROOT at line 86 to your own work directory. 
+
+"work_directory" is your main work directory. (Ex. work1)
+
+"username" is the name assigned to you on the server. (Ex. harsh)
+
+Open terminal and type the following commands one by one. 
+
+1. cd "work_directory"   							//ex cd work1 , do not include ""
+
+2. mkdir scl6m
+
+3. cd scl6m
+
+4. csh
+
+5. source ~/toolRC_scl_new
+
+6. echo username > user_list							// ex echo anirudh > user_list
+
+7. makeProjectTree scl6m -flow SCLSL18_6M1L -users user_list -flow_lib create -cds -attach -ver -assura -pvs	
+
+8. cd work_libs/username/cds 
+
+9. cdsprj scl6m
+
+10. virtuoso
+
+#--------------------------------#
+
+For opening existing project-
+
+1. csh
+
+2. source ~/toolRC_scl_new
+
+
+3. cdsprj scl6m
+
+4. virtuoso
+
+#--------------------------------#
