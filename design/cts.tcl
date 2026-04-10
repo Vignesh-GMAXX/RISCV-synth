@@ -8,6 +8,22 @@ file mkdir $report_dir
 file mkdir $spec_dir
 
 source [file join $script_dir config.tcl]
+
+# Ensure interactive SDC commands (if needed later) have an enabled constraint mode.
+set active_constraint_modes {}
+if {[catch {set active_constraint_modes [all_constraint_modes -active]} _acm_err]} {
+	set active_constraint_modes {}
+}
+if {[llength $active_constraint_modes] == 0} {
+	set available_constraint_modes {}
+	if {![catch {set available_constraint_modes [all_constraint_modes]} _cm_err] && [llength $available_constraint_modes] > 0} {
+		puts "INFO: Enabling interactive constraint modes: $available_constraint_modes"
+		set_interactive_constraint_modes $available_constraint_modes
+	} else {
+		puts "WARN: No constraint modes available for interactive SDC commands."
+	}
+}
+
 set ccopt_spec_file [file join $spec_dir ${init_top_cell}_ccopt.spec]
 create_ccopt_clock_tree_spec -file $ccopt_spec_file
 source $ccopt_spec_file
@@ -38,7 +54,9 @@ if {[llength $discovered_trees] == 0} {
 	}
 
 	puts "INFO: Creating fallback clock core_clk_fallback (10ns) and regenerating CCOpt spec."
-	create_clock -name core_clk_fallback -period 10.000 -waveform {0 5} $fallback_src
+	if {[catch {create_clock -name core_clk_fallback -period 10.000 -waveform {0 5} $fallback_src} _clk_err]} {
+		error "Fallback create_clock failed. Enable an interactive constraint mode (for example: set_interactive_constraint_modes functional). Original error: $_clk_err"
+	}
 	create_ccopt_clock_tree_spec -file $ccopt_spec_file
 	source $ccopt_spec_file
 	catch {set discovered_trees [get_ccopt_clock_trees *]}
