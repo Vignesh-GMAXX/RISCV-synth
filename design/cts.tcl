@@ -11,6 +11,41 @@ source [file join $script_dir config.tcl]
 set ccopt_spec_file [file join $spec_dir ${init_top_cell}_ccopt.spec]
 create_ccopt_clock_tree_spec -file $ccopt_spec_file
 source $ccopt_spec_file
+
+# If no tree is inferred from SDC/MMMC, create a fallback real clock and regenerate spec.
+set discovered_trees {}
+catch {set discovered_trees [get_ccopt_clock_trees *]}
+if {[llength $discovered_trees] == 0} {
+	puts "WARN: No CCOpt clock trees discovered from current constraints."
+	set fallback_src {}
+	set pin_try [get_pins -quiet {u_microprocessor_core/clk}]
+	if {[llength $pin_try] > 0} {
+		set fallback_src $pin_try
+	} else {
+		set port_try [get_ports -quiet {clk_pad}]
+		if {[llength $port_try] > 0} {
+			set fallback_src $port_try
+		} else {
+			set port_try [get_ports -quiet {clk}]
+			if {[llength $port_try] > 0} {
+				set fallback_src $port_try
+			}
+		}
+	}
+
+	if {[llength $fallback_src] == 0} {
+		error "No fallback clock source found (tried u_microprocessor_core/clk, clk_pad, clk)."
+	}
+
+	puts "INFO: Creating fallback clock core_clk_fallback (10ns) and regenerating CCOpt spec."
+	create_clock -name core_clk_fallback -period 10.000 -waveform {0 5} $fallback_src
+	create_ccopt_clock_tree_spec -file $ccopt_spec_file
+	source $ccopt_spec_file
+	catch {set discovered_trees [get_ccopt_clock_trees *]}
+	if {[llength $discovered_trees] == 0} {
+		error "CCOpt still has no clock trees after fallback clock creation."
+	}
+}
 ctd_win -id before_ccopt 
 
 set_ccopt_property -delay_corner max_delay -net_type top   target_max_trans 2 
