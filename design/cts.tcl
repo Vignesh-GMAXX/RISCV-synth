@@ -9,19 +9,51 @@ file mkdir $spec_dir
 
 source [file join $script_dir config.tcl]
 
-# Ensure interactive SDC commands (if needed later) have an enabled constraint mode.
-set active_constraint_modes {}
-if {[catch {set active_constraint_modes [all_constraint_modes -active]} _acm_err]} {
-	set active_constraint_modes {}
-}
-if {[llength $active_constraint_modes] == 0} {
-	set available_constraint_modes {}
-	if {![catch {set available_constraint_modes [all_constraint_modes]} _cm_err] && [llength $available_constraint_modes] > 0} {
-		puts "INFO: Enabling interactive constraint modes: $available_constraint_modes"
-		set_interactive_constraint_modes $available_constraint_modes
-	} else {
-		puts "WARN: No constraint modes available for interactive SDC commands."
+# Try to enable at least one interactive constraint mode for interactive SDC commands.
+proc ensure_interactive_constraint_mode {} {
+	# Common mode names seen across this project flows.
+	foreach cm {functional CONSTRAINT_FUNC} {
+		if {![catch {set_interactive_constraint_modes $cm} _err]} {
+			puts "INFO: Interactive constraint mode enabled: $cm"
+			return 1
+		}
+		if {![catch {set_interactive_constraint_mode $cm} _err_s]} {
+			puts "INFO: Interactive constraint mode enabled: $cm"
+			return 1
+		}
 	}
+
+	# Fallback: try all discovered modes as returned by the tool.
+	set cm_objs {}
+	if {![catch {set cm_objs [all_constraint_modes]} _cm_err] && [llength $cm_objs] > 0} {
+		if {![catch {set_interactive_constraint_modes $cm_objs} _set_err]} {
+			puts "INFO: Interactive constraint modes enabled: $cm_objs"
+			return 1
+		}
+		if {![catch {set_interactive_constraint_mode $cm_objs} _set_err_s]} {
+			puts "INFO: Interactive constraint modes enabled: $cm_objs"
+			return 1
+		}
+
+		# If the API returned objects, resolve to names and retry.
+		set cm_names {}
+		foreach cmo $cm_objs {
+			set cm_name ""
+			if {![catch {set cm_name [get_object_name $cmo]} _name_err] && $cm_name ne ""} {
+				lappend cm_names $cm_name
+			}
+		}
+		if {[llength $cm_names] > 0 && ![catch {set_interactive_constraint_modes $cm_names} _name_set_err]} {
+			puts "INFO: Interactive constraint modes enabled: $cm_names"
+			return 1
+		}
+		if {[llength $cm_names] > 0 && ![catch {set_interactive_constraint_mode $cm_names} _name_set_err_s]} {
+			puts "INFO: Interactive constraint modes enabled: $cm_names"
+			return 1
+		}
+	}
+
+	return 0
 }
 
 set ccopt_spec_file [file join $spec_dir ${init_top_cell}_ccopt.spec]
@@ -51,6 +83,10 @@ if {[llength $discovered_trees] == 0} {
 
 	if {[llength $fallback_src] == 0} {
 		error "No fallback clock source found (tried u_microprocessor_core/clk, clk_pad, clk)."
+	}
+
+	if {![ensure_interactive_constraint_mode]} {
+		puts "WARN: Unable to explicitly enable interactive constraint mode; attempting fallback create_clock anyway."
 	}
 
 	puts "INFO: Creating fallback clock core_clk_fallback (10ns) and regenerating CCOpt spec."
