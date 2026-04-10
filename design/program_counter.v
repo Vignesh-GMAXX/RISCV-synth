@@ -11,7 +11,7 @@ module pc (
 
     always @(posedge clk or negedge rst) begin
     if(!rst)begin
-        address_out <= 0;
+        address_out <= 32'b0;
     end
     else begin
         if (redirect)begin

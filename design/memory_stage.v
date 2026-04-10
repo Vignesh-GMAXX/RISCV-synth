@@ -32,12 +32,12 @@ module memory_stage (
 
     always @ (*) begin
         if (!rst) begin
-            request = 0;
-            we_re = 0;
+            request = 1'b0;
+            we_re = 1'b0;
         end
         else if (!valid & !load & !store) begin
-            request = 0;
-            we_re = 0;
+            request = 1'b0;
+            we_re = 1'b0;
         end
         else begin
             request = load | store ;

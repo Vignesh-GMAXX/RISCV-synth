@@ -48,6 +48,7 @@ module core (
     wire [31:0] next_sel_address_execute , next_sel_address_memstage;
     wire [31:0] next_sel_address_wb;
     wire [31:0] wrap_load_memstage , wrap_load_wb;
+    wire [31:0] pre_address_wb_unused;
     wire [31:0] rd_wb_data;
     wire [31:0] alu_in_a , alu_in_b;
     wire [31:0] store_data_forward_execute;
@@ -101,7 +102,7 @@ assign load_use_hazard = load_execute && (rd_execute != 5'd0) &&
     decode u_decodestage(
         .clk(clk),
         .rst(rst),
-        .valid(data_mem_valid),
+        .valid(instruc_mem_valid),
         .load_control_signal(load_execute),
         .reg_write_en_in(reg_write_wb),
         .instruction(instruction_decode),
@@ -301,7 +302,7 @@ assign load_use_hazard = load_execute && (rd_execute != 5'd0) &&
         .mem_reg_out(mem_to_reg_wb),
         .next_sel_address(next_sel_address_wb),
         .instruction_out(instruction_wb),
-        .pre_address_out(),
+        .pre_address_out(pre_address_wb_unused),
         .wrap_load_out(wrap_load_wb)
     );
 

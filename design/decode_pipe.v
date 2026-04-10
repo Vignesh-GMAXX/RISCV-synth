@@ -52,44 +52,44 @@ module  decode_pipe(
 
   always @ (posedge clk or negedge rst) begin
     if (!rst) begin
-      l           <= 0;
-      s           <= 0;
-      jalr        <= 0;
-      nextsel     <= 0;
-      branch_res  <= 0;
-      mem_reg     <= 0;
-      alu_con     <= 0;
-      opa_mux     <= 0;
-      opb_mux     <= 0;
-      opb_data    <= 0;
-      pre_address <= 0;
+      l           <= 1'b0;
+      s           <= 1'b0;
+      jalr        <= 1'b0;
+      nextsel     <= 1'b0;
+      branch_res  <= 1'b0;
+      mem_reg     <= 2'b00;
+      alu_con     <= 5'b00000;
+      opa_mux     <= 32'b0;
+      opb_mux     <= 32'b0;
+      opb_data    <= 32'b0;
+      pre_address <= 32'b0;
       instruction <= 32'h00000013;
-      reg_write   <= 0;
-      rs1         <= 0;
-      rs2         <= 0;
-      fun3        <= 0; 
-      op_a_raw    <= 0;
+      reg_write   <= 1'b0;
+      rs1         <= 5'b00000;
+      rs2         <= 5'b00000;
+      fun3        <= 3'b000;
+      op_a_raw    <= 32'b0;
     end
     else begin
   if (flush) begin
     // ? INSERT NOP (FLUSH)
-    l           <= 0;
-    s           <= 0;
-    jalr        <= 0;
-    nextsel     <= 0;
-    branch_res  <= 0;
-    mem_reg     <= 0;
-    alu_con     <= 0;
-    opa_mux     <= 0;
-    opb_mux     <= 0;
-    opb_data    <= 0;
-    pre_address <= 0;
+    l           <= 1'b0;
+    s           <= 1'b0;
+    jalr        <= 1'b0;
+    nextsel     <= 1'b0;
+    branch_res  <= 1'b0;
+    mem_reg     <= 2'b00;
+    alu_con     <= 5'b00000;
+    opa_mux     <= 32'b0;
+    opb_mux     <= 32'b0;
+    opb_data    <= 32'b0;
+    pre_address <= 32'b0;
     instruction <= 32'h00000013; // NOP
-    reg_write   <= 0;
-    rs1         <= 0;
-    rs2         <= 0;
-    fun3        <= 0; 
-    op_a_raw    <= 0;
+    reg_write   <= 1'b0;
+    rs1         <= 5'b00000;
+    rs2         <= 5'b00000;
+    fun3        <= 3'b000;
+    op_a_raw    <= 32'b0;
   end
   else begin
     // NORMAL FLOW

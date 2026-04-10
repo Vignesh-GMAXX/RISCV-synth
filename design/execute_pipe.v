@@ -29,15 +29,15 @@ module execute_pipe(
 
   always @ (posedge clk or negedge rst) begin
     if (!rst) begin
-      load          <= 0;
-      store         <= 0;
-      mem_reg       <= 0;
-      opb_data      <= 0;
-      pre_address   <= 0;
+      load          <= 1'b0;
+      store         <= 1'b0;
+      mem_reg       <= 2'b00;
+      opb_data      <= 32'b0;
+      pre_address   <= 32'b0;
       instruction   <= 32'h00000013;
-      alu_result    <= 0;
-      nextsel_addr  <= 0;
-      reg_write     <= 0;
+      alu_result    <= 32'b0;
+      nextsel_addr  <= 32'b0;
+      reg_write     <= 1'b0;
     end
     else begin
       load          <= load_in;

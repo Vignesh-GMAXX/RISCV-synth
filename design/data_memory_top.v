@@ -14,7 +14,7 @@ module data_memory_top (
 
     always @(posedge clk or negedge rst ) begin
         if(!rst)begin
-            valid <= 0;
+            valid <= 1'b0;
         end
         else begin
             valid <= load;

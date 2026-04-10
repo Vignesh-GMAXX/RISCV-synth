@@ -1,39 +1,191 @@
 module instruction_memory #(
     parameter INIT_FILE = ""
 ) (
-    input wire        clk,
     input wire        request,
     input wire [7:0]  address,
     input wire [1:0]  bank_sel,
     output reg [31:0] data_out
 );
-    // Keep bank0 name as "mem" so existing testbenches can still poke instructions.
+    localparam [31:0] NOP = 32'h00000013;
+
+    wire [4:0] addr_idx;
+    wire addr_out_of_range;
+    reg [31:0] bank_data;
+
+    // cadence translate_off
+    // Keep simulation-visible memory arrays for existing TB hierarchical pokes.
     reg [31:0] mem [0:127];
     reg [31:0] mem_bank1 [0:127];
     reg [31:0] mem_bank2 [0:127];
     reg [31:0] mem_bank3 [0:127];
-
-    wire [4:0] addr_idx;
-    wire addr_out_of_range;
+    reg [31:0] sim_bank_data;
     integer i;
+    // cadence translate_on
 
     assign addr_idx = address[4:0];
     // Fabrication mode uses 32 words per bank; higher word addresses read NOP.
     assign addr_out_of_range = |address[7:5];
 
+    function automatic [31:0] bank0_rom;
+        input [4:0] idx;
+        begin
+            case (idx)
+                5'd0: bank0_rom = 32'h01000093;
+                5'd1: bank0_rom = 32'h00500113;
+                5'd2: bank0_rom = 32'h00900193;
+                5'd3: bank0_rom = 32'h00310233;
+                5'd4: bank0_rom = 32'h402202B3;
+                5'd5: bank0_rom = 32'h00211333;
+                5'd6: bank0_rom = 32'h003123B3;
+                5'd7: bank0_rom = 32'h00313433;
+                5'd8: bank0_rom = 32'h003144B3;
+                5'd9: bank0_rom = 32'h00235533;
+                5'd10: bank0_rom = 32'hFF000713;
+                5'd11: bank0_rom = 32'h402755B3;
+                5'd12: bank0_rom = 32'h00316633;
+                5'd13: bank0_rom = 32'h003176B3;
+                5'd14: bank0_rom = 32'h00710793;
+                5'd15: bank0_rom = 32'h00211813;
+                5'd16: bank0_rom = 32'h00612893;
+                5'd17: bank0_rom = 32'h00613913;
+                5'd18: bank0_rom = 32'h00314993;
+                5'd19: bank0_rom = 32'h00235A13;
+                5'd20: bank0_rom = 32'h40275A93;
+                5'd21: bank0_rom = 32'h00816B13;
+                5'd22: bank0_rom = 32'h0081FB93;
+                5'd23: bank0_rom = 32'h12345C37;
+                5'd24: bank0_rom = 32'h00001C97;
+                5'd25: bank0_rom = 32'h0040A023;
+                5'd26: bank0_rom = 32'h00509223;
+                5'd27: bank0_rom = 32'h00308423;
+                5'd28: bank0_rom = 32'h0000AD03;
+                5'd29: bank0_rom = 32'h00409D83;
+                5'd30: bank0_rom = 32'h00808E03;
+                5'd31: bank0_rom = 32'h0000006F;
+                default: bank0_rom = NOP;
+            endcase
+        end
+    endfunction
+
+    function automatic [31:0] bank1_rom;
+        input [4:0] idx;
+        begin
+            case (idx)
+                5'd0: bank1_rom = 32'h00500093;
+                5'd1: bank1_rom = 32'h00500113;
+                5'd2: bank1_rom = 32'h00100193;
+                5'd3: bank1_rom = 32'h00000F93;
+                5'd4: bank1_rom = 32'h00208663;
+                5'd5: bank1_rom = 32'h001F8F93;
+                5'd6: bank1_rom = 32'h001F8F93;
+                5'd7: bank1_rom = 32'h00209463;
+                5'd8: bank1_rom = 32'h002F8F93;
+                5'd9: bank1_rom = 32'h0021C463;
+                5'd10: bank1_rom = 32'h004F8F93;
+                5'd11: bank1_rom = 32'h00115463;
+                5'd12: bank1_rom = 32'h008F8F93;
+                5'd13: bank1_rom = 32'h0021E463;
+                5'd14: bank1_rom = 32'h010F8F93;
+                5'd15: bank1_rom = 32'h00317463;
+                5'd16: bank1_rom = 32'h020F8F93;
+                5'd17: bank1_rom = 32'h00000717;
+                5'd18: bank1_rom = 32'h00C0036F;
+                5'd19: bank1_rom = 32'h040F8F93;
+                5'd20: bank1_rom = 32'h040F8F93;
+                5'd21: bank1_rom = 32'h04D00793;
+                5'd22: bank1_rom = 32'h01C703E7;
+                5'd23: bank1_rom = 32'h040F8F93;
+                5'd24: bank1_rom = 32'h05800813;
+                5'd25: bank1_rom = 32'h00000463;
+                5'd26: bank1_rom = 32'h040F8F93;
+                5'd27: bank1_rom = 32'h06300893;
+                5'd28: bank1_rom = 32'h0000006F;
+                default: bank1_rom = NOP;
+            endcase
+        end
+    endfunction
+
+    function automatic [31:0] bank2_rom;
+        input [4:0] idx;
+        begin
+            case (idx)
+                5'd0: bank2_rom = 32'h00700093;
+                5'd1: bank2_rom = 32'h00900113;
+                5'd2: bank2_rom = 32'h002081B3;
+                5'd3: bank2_rom = 32'h40118233;
+                5'd4: bank2_rom = 32'h00520293;
+                5'd5: bank2_rom = 32'h00502023;
+                5'd6: bank2_rom = 32'h00002303;
+                5'd7: bank2_rom = 32'h002303B3;
+                5'd8: bank2_rom = 32'h00138413;
+                5'd9: bank2_rom = 32'h003404B3;
+                5'd10: bank2_rom = 32'h00902223;
+                5'd11: bank2_rom = 32'h00402503;
+                5'd12: bank2_rom = 32'h00950463;
+                5'd13: bank2_rom = 32'h06300593;
+                5'd14: bank2_rom = 32'h03700593;
+                5'd15: bank2_rom = 32'h00300613;
+                5'd16: bank2_rom = 32'h00B606B3;
+                5'd17: bank2_rom = 32'h00D02423;
+                5'd18: bank2_rom = 32'h00802703;
+                5'd19: bank2_rom = 32'h001707B3;
+                5'd20: bank2_rom = 32'h00078A13;
+                5'd21: bank2_rom = 32'h00050A93;
+                5'd22: bank2_rom = 32'h00030B13;
+                5'd23: bank2_rom = 32'h0000006F;
+                default: bank2_rom = NOP;
+            endcase
+        end
+    endfunction
+
+    function automatic [31:0] bank3_rom;
+        input [4:0] idx;
+        begin
+            case (idx)
+                5'd0: bank3_rom = 32'h00A00093;
+                5'd1: bank3_rom = 32'h00000113;
+                5'd2: bank3_rom = 32'h00100193;
+                5'd3: bank3_rom = 32'h00000213;
+                5'd4: bank3_rom = 32'h00120C63;
+                5'd5: bank3_rom = 32'h003102B3;
+                5'd6: bank3_rom = 32'h00018113;
+                5'd7: bank3_rom = 32'h00028193;
+                5'd8: bank3_rom = 32'h00120213;
+                5'd9: bank3_rom = 32'hFEDFF06F;
+                5'd10: bank3_rom = 32'h00202023;
+                5'd11: bank3_rom = 32'h00010513;
+                5'd12: bank3_rom = 32'h00018593;
+                5'd13: bank3_rom = 32'h00020613;
+                5'd14: bank3_rom = 32'h00008693;
+                5'd15: bank3_rom = 32'h0000006F;
+                default: bank3_rom = NOP;
+            endcase
+        end
+    endfunction
+
+    always @(*) begin
+        case (bank_sel)
+            2'b00: bank_data = bank0_rom(addr_idx);
+            2'b01: bank_data = bank1_rom(addr_idx);
+            2'b10: bank_data = bank2_rom(addr_idx);
+            2'b11: bank_data = bank3_rom(addr_idx);
+            default: bank_data = NOP;
+        endcase
+    end
+
+    // cadence translate_off
     initial begin
         for (i = 0; i < 128; i = i + 1) begin
-            mem[i]       = 32'h00000013; // NOP default
-            mem_bank1[i] = 32'h00000013;
-            mem_bank2[i] = 32'h00000013;
-            mem_bank3[i] = 32'h00000013;
+            mem[i]       = NOP;
+            mem_bank1[i] = NOP;
+            mem_bank2[i] = NOP;
+            mem_bank3[i] = NOP;
         end
 
         if (INIT_FILE != "") begin
             $readmemh(INIT_FILE, mem);
         end
         else begin
-            // Bank0: RV32I data-path coverage (R/I/S/U + memory readback).
             mem[0] = 32'h01000093;
             mem[1] = 32'h00500113;
             mem[2] = 32'h00900193;
@@ -68,7 +220,6 @@ module instruction_memory #(
             mem[31] = 32'h0000006F;
         end
 
-        // Bank1: branch/jump + control-hazard stress.
         mem_bank1[0] = 32'h00500093;
         mem_bank1[1] = 32'h00500113;
         mem_bank1[2] = 32'h00100193;
@@ -98,11 +249,7 @@ module instruction_memory #(
         mem_bank1[26] = 32'h040F8F93;
         mem_bank1[27] = 32'h06300893;
         mem_bank1[28] = 32'h0000006F;
-        mem_bank1[29] = 32'h00000013;
-        mem_bank1[30] = 32'h00000013;
-        mem_bank1[31] = 32'h00000013;
 
-        // Bank2: load-use/RAW/store-forwarding hazard checks.
         mem_bank2[0] = 32'h00700093;
         mem_bank2[1] = 32'h00900113;
         mem_bank2[2] = 32'h002081B3;
@@ -127,16 +274,7 @@ module instruction_memory #(
         mem_bank2[21] = 32'h00050A93;
         mem_bank2[22] = 32'h00030B13;
         mem_bank2[23] = 32'h0000006F;
-        mem_bank2[24] = 32'h00000013;
-        mem_bank2[25] = 32'h00000013;
-        mem_bank2[26] = 32'h00000013;
-        mem_bank2[27] = 32'h00000013;
-        mem_bank2[28] = 32'h00000013;
-        mem_bank2[29] = 32'h00000013;
-        mem_bank2[30] = 32'h00000013;
-        mem_bank2[31] = 32'h00000013;
 
-        // Bank3: mixed algorithm program (iterative Fibonacci, n=10).
         mem_bank3[0] = 32'h00A00093;
         mem_bank3[1] = 32'h00000113;
         mem_bank3[2] = 32'h00100193;
@@ -153,37 +291,29 @@ module instruction_memory #(
         mem_bank3[13] = 32'h00020613;
         mem_bank3[14] = 32'h00008693;
         mem_bank3[15] = 32'h0000006F;
-        mem_bank3[16] = 32'h00000013;
-        mem_bank3[17] = 32'h00000013;
-        mem_bank3[18] = 32'h00000013;
-        mem_bank3[19] = 32'h00000013;
-        mem_bank3[20] = 32'h00000013;
-        mem_bank3[21] = 32'h00000013;
-        mem_bank3[22] = 32'h00000013;
-        mem_bank3[23] = 32'h00000013;
-        mem_bank3[24] = 32'h00000013;
-        mem_bank3[25] = 32'h00000013;
-        mem_bank3[26] = 32'h00000013;
-        mem_bank3[27] = 32'h00000013;
-        mem_bank3[28] = 32'h00000013;
-        mem_bank3[29] = 32'h00000013;
-        mem_bank3[30] = 32'h00000013;
-        mem_bank3[31] = 32'h00000013;
     end
+
+    always @(*) begin
+        case (bank_sel)
+            2'b00: sim_bank_data = mem[addr_idx];
+            2'b01: sim_bank_data = mem_bank1[addr_idx];
+            2'b10: sim_bank_data = mem_bank2[addr_idx];
+            2'b11: sim_bank_data = mem_bank3[addr_idx];
+            default: sim_bank_data = mem[addr_idx];
+        endcase
+    end
+    // cadence translate_on
 
     always @(*) begin
         if (request) begin
             if (addr_out_of_range) begin
-                data_out = 32'h00000013;
+                data_out = NOP;
             end
             else begin
-                case (bank_sel)
-                    2'b00: data_out = mem[addr_idx];
-                    2'b01: data_out = mem_bank1[addr_idx];
-                    2'b10: data_out = mem_bank2[addr_idx];
-                    2'b11: data_out = mem_bank3[addr_idx];
-                    default: data_out = mem[addr_idx];
-                endcase
+                data_out = bank_data;
+                // cadence translate_off
+                data_out = sim_bank_data;
+                // cadence translate_on
             end
         end
         else begin

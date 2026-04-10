@@ -25,13 +25,13 @@ module memory_pipe(
 
   always @ (posedge clk) begin
     if (!rst) begin
-      mem_reg        <= 0;
-      alu_result     <= 0;
-      nextsel_addr   <= 0;
-      wrap_load      <= 0;
+      mem_reg        <= 2'b00;
+      alu_result     <= 32'b0;
+      nextsel_addr   <= 32'b0;
+      wrap_load      <= 32'b0;
       instruction    <= 32'h00000013;
-      reg_write      <= 0;
-      pre_address_pc <= 0;
+      reg_write      <= 1'b0;
+      pre_address_pc <= 32'b0;
     end
     else begin
       mem_reg        <= mem_reg_in;

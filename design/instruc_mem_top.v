@@ -13,7 +13,7 @@ module instruc_mem_top #(
 
     always @(posedge clk or negedge rst ) begin
         if(!rst)begin
-            valid <= 0;
+            valid <= 1'b0;
         end
         else begin
             valid <= request;
@@ -23,7 +23,6 @@ module instruc_mem_top #(
     instruction_memory #(
         .INIT_FILE(INIT_FILE)
     ) u_memory(
-        .clk(clk),
         .request(request),
         .address(address),
         .bank_sel(bank_sel),

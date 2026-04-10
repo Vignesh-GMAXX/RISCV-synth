@@ -16,7 +16,19 @@ module type_decoder (opcode,r_type,i_type,load,store,branch,jal,jalr,lui,auipc,v
     output reg lui;
     output reg auipc;
 
-    always @(*)begin  
+    always @(*)begin
+        if (!valid || load_signal_controller) begin
+            r_type = 1'b0;
+            i_type = 1'b0;
+            store = 1'b0;
+            load = 1'b0;
+            branch = 1'b0;
+            auipc = 1'b0;
+            jal = 1'b0;
+            jalr = 1'b0;
+            lui = 1'b0;
+        end
+        else begin
         case(opcode)
             7'b0110011:begin 
                 r_type = 1'b1;
@@ -130,6 +142,7 @@ module type_decoder (opcode,r_type,i_type,load,store,branch,jal,jalr,lui,auipc,v
                 lui = 1'b0; 
             end
         endcase
+        end
     end  
 endmodule
 // MODULE_BRIEF: Classifies instructions into RV32I format/type groups for control generation.
