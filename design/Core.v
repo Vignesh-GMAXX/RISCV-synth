@@ -48,7 +48,7 @@ module core (
     wire [31:0] next_sel_address_execute , next_sel_address_memstage;
     wire [31:0] next_sel_address_wb;
     wire [31:0] wrap_load_memstage , wrap_load_wb;
-    wire [31:0] pre_address_wb_unused;
+    wire [31:0] pre_address_wb;
     wire [31:0] rd_wb_data;
     wire [31:0] alu_in_a , alu_in_b;
     wire [31:0] store_data_forward_execute;
@@ -282,7 +282,7 @@ assign load_use_hazard = load_execute && (rd_execute != 5'd0) &&
         branch_en_execute,
         hazard_flush,
         load_use_hazard,
-        1'b0
+        pre_address_wb[0]
     };
     assign alu_mem_bytes_out = {load_data_in[7:0], alu_res_out_execute[7:0], alu_in_b[7:0], alu_in_a[7:0]};
 
@@ -302,7 +302,7 @@ assign load_use_hazard = load_execute && (rd_execute != 5'd0) &&
         .mem_reg_out(mem_to_reg_wb),
         .next_sel_address(next_sel_address_wb),
         .instruction_out(instruction_wb),
-        .pre_address_out(pre_address_wb_unused),
+        .pre_address_out(pre_address_wb),
         .wrap_load_out(wrap_load_wb)
     );
 

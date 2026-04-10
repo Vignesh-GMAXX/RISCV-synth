@@ -23,7 +23,7 @@ module microprocessor #(
     wire data_mem_we_re;
     wire data_mem_request;
     wire load_signal;
-    wire [15:0] x1_to_x4_nibbles_unused;
+    wire [15:0] x1_to_x4_nibbles;
     wire [31:0] x10_to_x13_bytes;
     wire [7:0]  ifid_pc_word;
     wire [31:0] ifid_instruction;
@@ -63,7 +63,7 @@ module microprocessor #(
             2'b00: dbg_out = x10_to_x13_bytes;
             2'b01: dbg_out = control_pc_view;
             2'b10: dbg_out = ifid_instruction;
-            2'b11: dbg_out = alu_mem_bytes;
+            2'b11: dbg_out = {x1_to_x4_nibbles, alu_mem_bytes[15:0]};
             default: dbg_out = 32'b0;
         endcase
     end
@@ -97,7 +97,7 @@ module microprocessor #(
         .store_data_out(store_data),
         .pc_address(pc_address),
         .alu_out_address(alu_out_address),
-        .x1_to_x4_nibbles_out(x1_to_x4_nibbles_unused),
+        .x1_to_x4_nibbles_out(x1_to_x4_nibbles),
         .x10_to_x13_bytes_out(x10_to_x13_bytes),
         .ifid_pc_word_out(ifid_pc_word),
         .ifid_instruction_out(ifid_instruction),

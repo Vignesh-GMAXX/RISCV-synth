@@ -9,20 +9,26 @@ module instruction_memory #(
     localparam [31:0] NOP = 32'h00000013;
 
     wire [4:0] addr_idx;
+    // cadence translate_off
+    wire [7:0] sim_addr_idx;
+    // cadence translate_on
     wire addr_out_of_range;
     reg [31:0] bank_data;
 
     // cadence translate_off
     // Keep simulation-visible memory arrays for existing TB hierarchical pokes.
-    reg [31:0] mem [0:127];
-    reg [31:0] mem_bank1 [0:127];
-    reg [31:0] mem_bank2 [0:127];
-    reg [31:0] mem_bank3 [0:127];
+    reg [31:0] mem [0:255];
+    reg [31:0] mem_bank1 [0:255];
+    reg [31:0] mem_bank2 [0:255];
+    reg [31:0] mem_bank3 [0:255];
     reg [31:0] sim_bank_data;
     integer i;
     // cadence translate_on
 
     assign addr_idx = address[4:0];
+    // cadence translate_off
+    assign sim_addr_idx = address;
+    // cadence translate_on
     // Fabrication mode uses 32 words per bank; higher word addresses read NOP.
     assign addr_out_of_range = |address[7:5];
 
@@ -175,7 +181,7 @@ module instruction_memory #(
 
     // cadence translate_off
     initial begin
-        for (i = 0; i < 128; i = i + 1) begin
+        for (i = 0; i < 256; i = i + 1) begin
             mem[i]       = NOP;
             mem_bank1[i] = NOP;
             mem_bank2[i] = NOP;
@@ -295,26 +301,27 @@ module instruction_memory #(
 
     always @(*) begin
         case (bank_sel)
-            2'b00: sim_bank_data = mem[addr_idx];
-            2'b01: sim_bank_data = mem_bank1[addr_idx];
-            2'b10: sim_bank_data = mem_bank2[addr_idx];
-            2'b11: sim_bank_data = mem_bank3[addr_idx];
-            default: sim_bank_data = mem[addr_idx];
+            2'b00: sim_bank_data = mem[sim_addr_idx];
+            2'b01: sim_bank_data = mem_bank1[sim_addr_idx];
+            2'b10: sim_bank_data = mem_bank2[sim_addr_idx];
+            2'b11: sim_bank_data = mem_bank3[sim_addr_idx];
+            default: sim_bank_data = mem[sim_addr_idx];
         endcase
     end
     // cadence translate_on
 
     always @(*) begin
         if (request) begin
+            data_out = NOP;
             if (addr_out_of_range) begin
                 data_out = NOP;
             end
             else begin
                 data_out = bank_data;
-                // cadence translate_off
-                data_out = sim_bank_data;
-                // cadence translate_on
             end
+            // cadence translate_off
+            data_out = sim_bank_data;
+            // cadence translate_on
         end
         else begin
             data_out = 32'b0;

@@ -17,7 +17,6 @@ module control_decoder (
     output reg jalr_out,
     output reg [1:0] mem_to_reg,
     output reg reg_write,
-    output reg mem_en,
     output reg operand_b,
     output reg operand_a,
     output reg [2:0]imm_sel,
@@ -30,7 +29,7 @@ wire fun_7 = fun7[5];
 
 always @(*) begin
     //reg write signal for register file
-    reg_write = r_type | i_type | load | jal | jalr | lui | auipc | load_control;
+    reg_write = r_type | i_type | load | jal | jalr | lui | auipc;
     //operand a select for first input of alu
     operand_a = branch | jal | auipc;
     //operand b signal for second input of alu
@@ -44,8 +43,6 @@ always @(*) begin
     //selection for next address if any jump instrucion run
     next_sel = jal;
     jalr_out = jalr;
-    //mem enable
-    mem_en = store;
 
     if(r_type)begin //rtype
         mem_to_reg = 2'b00;

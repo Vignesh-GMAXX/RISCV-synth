@@ -31,7 +31,6 @@ module decode (
     wire branch;
     wire operand_a;//0 for rs1, 1 for pc
     wire operand_b;//0 for rs2 and 1 for imm
-    wire mem_en_unused;
     wire [2:0]  imm_sel; //type of imm 
     wire [31:0] op_a , op_b;
     wire [31:0] imm_mux_out;
@@ -53,7 +52,6 @@ module decode (
         .Store(store),
         .jalr_out(jalr),
         .Branch(branch),
-        .mem_en(mem_en_unused),
         .load_control(load_control_signal),
         .alu_control(alu_control)
     );

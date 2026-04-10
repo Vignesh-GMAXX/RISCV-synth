@@ -17,7 +17,9 @@ module type_decoder (opcode,r_type,i_type,load,store,branch,jal,jalr,lui,auipc,v
     output reg auipc;
 
     always @(*)begin
-        if (!valid || load_signal_controller) begin
+        // Keep load_signal_controller in the interface for compatibility,
+        // but decode validity is governed only by instruction memory validity.
+        if (!valid) begin
             r_type = 1'b0;
             i_type = 1'b0;
             store = 1'b0;

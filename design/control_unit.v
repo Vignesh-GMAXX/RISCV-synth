@@ -14,7 +14,6 @@ module controlunit (
     output wire jalr_out,
     output wire Store,
     output wire Branch,
-    output wire mem_en,
     output wire next_sel,
     output wire [4:0] alu_control
 );
@@ -63,7 +62,6 @@ module controlunit (
         .jalr_out(jalr_out),
         .mem_to_reg(mem_to_reg),
         .reg_write(reg_write),
-        .mem_en(mem_en),
         .operand_b(operand_b),
         .operand_a(operand_a),
         .imm_sel(imm_sel),
