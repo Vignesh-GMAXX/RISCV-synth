@@ -130,6 +130,7 @@ module microprocessor_pad_top_tb;
         input [8*24:1] tag;
         begin
             @(posedge clk_pad);
+            #1;
             if (dbg_out_pad !== expected_dbg) begin
                 $display("FAIL: %0s dbg_out_pad expected=%h actual=%h", tag, expected_dbg, dbg_out_pad);
                 errors = errors + 1;

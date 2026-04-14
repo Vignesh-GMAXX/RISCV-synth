@@ -9,6 +9,11 @@ file mkdir $spec_dir
 
 source [file join $script_dir config.tcl]
 
+# Reset is an asynchronous control; do not time it as a functional datapath.
+if {[llength [get_ports -quiet {rst_pad}]] > 0} {
+	set_false_path -from [get_ports {rst_pad}] -to [all_registers]
+}
+
 # Enforce pad-wrapper top context for this flow.
 if {[llength [get_ports -quiet {clk_pad}]] == 0} {
 	error "Port clk_pad not found. Ensure the loaded netlist top is microprocessor_pad_top."

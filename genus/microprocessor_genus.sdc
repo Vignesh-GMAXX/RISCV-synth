@@ -127,6 +127,7 @@ if {[llength $CLKOUT_PORT] > 0} {
 # Reset is an asynchronous/static control.
 if {[llength $RST_PORT] > 0} {
 	set_false_path -from $RST_PORT -to [all_registers]
+	set_false_path -from $RST_PORT -to [all_outputs]
 }
 
 # Do not time forwarded observation clock as a data output.

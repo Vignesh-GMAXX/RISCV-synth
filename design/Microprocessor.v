@@ -30,6 +30,7 @@ module microprocessor #(
     wire [23:0] control_status;
     wire [31:0] alu_mem_bytes;
     wire [31:0] control_pc_view;
+    reg [31:0] dbg_out_next;
     reg [1:0] mem_bank_sel_safe;
     reg [1:0] dbg_sel_safe;
 
@@ -60,12 +61,21 @@ module microprocessor #(
 
     always @(*) begin
         case (dbg_sel_safe)
-            2'b00: dbg_out = x10_to_x13_bytes;
-            2'b01: dbg_out = control_pc_view;
-            2'b10: dbg_out = ifid_instruction;
-            2'b11: dbg_out = {x1_to_x4_nibbles, alu_mem_bytes[15:0]};
-            default: dbg_out = 32'b0;
+            2'b00: dbg_out_next = x10_to_x13_bytes;
+            2'b01: dbg_out_next = control_pc_view;
+            2'b10: dbg_out_next = ifid_instruction;
+            2'b11: dbg_out_next = {x1_to_x4_nibbles, alu_mem_bytes[15:0]};
+            default: dbg_out_next = 32'b0;
         endcase
+    end
+
+    always @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            dbg_out <= 32'b0;
+        end
+        else begin
+            dbg_out <= dbg_out_next;
+        end
     end
 
     // INSTRUCTION MEMORY
