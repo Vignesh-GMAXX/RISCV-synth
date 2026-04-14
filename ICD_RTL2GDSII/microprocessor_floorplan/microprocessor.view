@@ -14,7 +14,7 @@ create_op_cond -name op_cond_worst -library_file {/opt/tools/Cadence/Cadence_lib
 create_library_set -name max_timing -timing {/opt/tools/Cadence/Cadence_lib/scl_pdk_v3/SCLPDK_V3.0_KIT/scl180/stdcell/fs120/6M1L/liberty/lib_flow_ss/tsl18fs120_scl_ss.lib /opt/tools/Cadence/Cadence_lib/scl_pdk_v3/SCLPDK_V3.0_KIT/scl180/iopad/cio150/6M1L/liberty/tsl18cio150_max.lib}
 create_library_set -name min_timing -timing {/opt/tools/Cadence/Cadence_lib/scl_pdk_v3/SCLPDK_V3.0_KIT/scl180/stdcell/fs120/6M1L/liberty/lib_flow_ff/tsl18fs120_scl_ff.lib /opt/tools/Cadence/Cadence_lib/scl_pdk_v3/SCLPDK_V3.0_KIT/scl180/iopad/cio150/6M1L/liberty/tsl18cio150_min.lib}
 
-create_constraint_mode -name functional -sdc_files {../../genus/genus.sdc}
+create_constraint_mode -name functional -sdc_files {../../genus/microprocessor_genus.sdc}
 
 create_delay_corner -name max_delay -rc_corner {rc_worst} -early_library_set {min_timing} -late_library_set {max_timing} -early_opcond_library {tsl18fs120_scl_ff} -late_opcond_library {tsl18fs120_scl_ss} -early_opcond {op_cond_best} -late_opcond {op_cond_worst}
 create_delay_corner -name min_delay -rc_corner {rc_best} -early_library_set {min_timing} -late_library_set {max_timing} -early_opcond_library {tsl18fs120_scl_ff} -late_opcond_library {tsl18fs120_scl_ss} -early_opcond {op_cond_best} -late_opcond {op_cond_worst}

@@ -9,6 +9,14 @@ file mkdir $spec_dir
 
 source [file join $script_dir config.tcl]
 
+# Enforce pad-wrapper top context for this flow.
+if {[llength [get_ports -quiet {clk_pad}]] == 0} {
+	error "Port clk_pad not found. Ensure the loaded netlist top is microprocessor_pad_top."
+}
+if {[llength [get_ports -quiet {rst_pad}]] == 0} {
+	error "Port rst_pad not found. Ensure the loaded netlist top is microprocessor_pad_top."
+}
+
 # Try to enable at least one interactive constraint mode for interactive SDC commands.
 proc ensure_interactive_constraint_mode {} {
 	# Common mode names seen across this project flows.
@@ -66,31 +74,26 @@ catch {set discovered_trees [get_ccopt_clock_trees *]}
 if {[llength $discovered_trees] == 0} {
 	puts "WARN: No CCOpt clock trees discovered from current constraints."
 	set fallback_src {}
-	set pin_try [get_pins -quiet {u_microprocessor_core/clk}]
-	if {[llength $pin_try] > 0} {
-		set fallback_src $pin_try
+	set port_try [get_ports -quiet {clk_pad}]
+	if {[llength $port_try] > 0} {
+		set fallback_src $port_try
 	} else {
-		set port_try [get_ports -quiet {clk_pad}]
-		if {[llength $port_try] > 0} {
-			set fallback_src $port_try
-		} else {
-			set port_try [get_ports -quiet {clk}]
-			if {[llength $port_try] > 0} {
-				set fallback_src $port_try
-			}
+		set pin_try [get_pins -quiet {u_microprocessor_core/clk}]
+		if {[llength $pin_try] > 0} {
+			set fallback_src $pin_try
 		}
 	}
 
 	if {[llength $fallback_src] == 0} {
-		error "No fallback clock source found (tried u_microprocessor_core/clk, clk_pad, clk)."
+		error "No fallback clock source found (tried clk_pad, u_microprocessor_core/clk)."
 	}
 
 	if {![ensure_interactive_constraint_mode]} {
 		puts "WARN: Unable to explicitly enable interactive constraint mode; attempting fallback create_clock anyway."
 	}
 
-	puts "INFO: Creating fallback clock core_clk_fallback (10ns) and regenerating CCOpt spec."
-	if {[catch {create_clock -name core_clk_fallback -period 10.000 -waveform {0 5} $fallback_src} _clk_err]} {
+	puts "INFO: Creating fallback clock core_clk_fallback (20ns) and regenerating CCOpt spec."
+	if {[catch {create_clock -name core_clk_fallback -period 20.000 -waveform {0 10} $fallback_src} _clk_err]} {
 		error "Fallback create_clock failed. Enable an interactive constraint mode (for example: set_interactive_constraint_modes functional). Original error: $_clk_err"
 	}
 	create_ccopt_clock_tree_spec -file $ccopt_spec_file
@@ -127,7 +130,9 @@ if {[catch {set skew_groups [get_ccopt_skew_groups *]} _sg_err]} {
 set clock_trees {}
 if {![catch {set clock_trees [get_ccopt_clock_trees *]} _ct_err] && [llength $clock_trees] > 0} {
 	foreach ct $clock_trees {
-		catch {set_ccopt_property source_driver pc3d01/CIN -clock_tree $ct}
+		if {[catch {set_ccopt_property source_driver pc3d01_clk/CIN -clock_tree $ct} _sd_err]} {
+			catch {set_ccopt_property source_driver pc3d01/CIN -clock_tree $ct}
+		}
 	}
 }
 
