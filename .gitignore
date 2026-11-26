@@ -20,10 +20,22 @@ __pycache__/
 *.history
 
 # Optional generated run directories
-genus/outputs/
-genus/reports/
-genus/logs/
-innovus/outputs/
-innovus/reports/
-innovus/logs/
-innovus/run/
+synth/outputs/
+synth/reports/
+synth/logs*/
+synth/fv/
+pnr/microprocessor_cts/reports/
+pnr/microprocessor_cts/run/
+
+# Simulator outputs
+*.vvp
+*.out
+*.vcd
+*.fst
+temp/
+INCA_libs/
+xcelium.d/
+*.shm/
+.simvision/
+*.tstamp
+*~
